@@ -1,11 +1,11 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import List, Optional
+from typing import Optional
 
-# auth
 class RegisterIn(BaseModel):
-    username: str = Field(..., min_length=3)
+    username: str
     email: EmailStr
-    password: str = Field(..., min_length=8)
+    password: str
+    role: Optional[str] = "user"
 
 class LoginIn(BaseModel):
     email: EmailStr
@@ -13,8 +13,9 @@ class LoginIn(BaseModel):
 
 class TokenOut(BaseModel):
     access_token: str
-    token_type: str = "bearer"
+    token_type: str
     expires_in: int
+    refresh_token: str
 
 # products
 class ProductCreate(BaseModel):
@@ -37,3 +38,6 @@ class ProductOut(BaseModel):
 class RoleAssign(BaseModel):
     user_id: str
     role_name: str
+
+class RefreshIn(BaseModel):
+    refresh_token: str

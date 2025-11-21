@@ -5,8 +5,21 @@ from app.core.security import hash_password, hash_refresh_token
 
 # users
 def create_user(db: Session, username: str, email: str, password: str):
+    if password is None:
+        raise ValueError("Password is None — expected a string.")
+
+    if not isinstance(password, str):
+        raise ValueError(f"Password must be a string. Got {type(password)}: {repr(password)}")
+    
     uid = str(uuid.uuid4())
-    user = models.User(id=uid, username=username, email=email, password_hash=hash_password(password))
+    
+    user = models.User(
+        id=uid,
+        username=username,
+        email=email,
+        password_hash=hash_password(password)   # always safe now
+    )
+
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -18,7 +31,6 @@ def get_user_by_email(db: Session, email: str):
 def get_user(db: Session, user_id: str):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
-# roles/permissions
 def get_role_by_name(db: Session, name: str):
     return db.query(models.Role).filter(models.Role.name == name).first()
 
@@ -36,7 +48,6 @@ def assign_role_to_user(db: Session, user_id: str, role_name: str):
     role = get_role_by_name(db, role_name)
     if not role:
         role = create_role_if_not_exists(db, role_name)
-    # check existing
     exists = db.query(models.UserRole).filter(models.UserRole.user_id == user_id, models.UserRole.role_id == role.id).first()
     if exists:
         return exists

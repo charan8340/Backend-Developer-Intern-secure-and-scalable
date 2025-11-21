@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>Login</title></head>
+<body>
+  <h2>Login</h2>
+  <form id="form">
+    <label>Email: <input name="email" type="email" required></label><br>
+    <label>Password: <input name="password" type="password" required></label><br>
+    <button type="submit">Login</button>
+  </form>
+
+  <pre id="out"></pre>
+
+  <script type="module">
+    import { requestJSON, setAccessToken, setRefreshToken } from './utils.js';
+    const f = document.getElementById('form');
+    const out = document.getElementById('out');
+
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      out.textContent = 'Logging in...';
+      const payload = Object.fromEntries(new FormData(f));
+      const resp = await requestJSON('/v1/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (resp.ok && resp.data) {
+        const a = resp.data.access_token;
+        const r = resp.data.refresh_token;
+        setAccessToken(a);
+        if (r) setRefreshToken(r);
+        out.textContent = 'Logged in. Access token stored.';
+      } else {
+        out.textContent = `Error (${resp.status}): ${JSON.stringify(resp.data)}`;
+      }
+    });
+  </script>
+</body>
+</html>

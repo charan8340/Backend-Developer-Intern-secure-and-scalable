@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background: #f6f6f6;
+}
+
+.hidden {
+    display: none;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 6px;
+}
+
+.section {
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+.item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #eef;
+    border-radius: 4px;
+}

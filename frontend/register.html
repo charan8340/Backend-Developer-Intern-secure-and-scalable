@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>Register</title></head>
+<body>
+  <h2>Register</h2>
+  <form id="form">
+    <label>Username: <input name="username" required></label><br>
+    <label>Email: <input name="email" type="email" required></label><br>
+    <label>Password: <input name="password" type="password" required></label><br>
+    <button type="submit">Register</button>
+  </form>
+
+  <pre id="out"></pre>
+
+  <script type="module">
+    import { requestJSON } from './utils.js';
+    const f = document.getElementById('form');
+    const out = document.getElementById('out');
+
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      out.textContent = 'Registering...';
+      const payload = Object.fromEntries(new FormData(f));
+      const resp = await requestJSON('/v1/auth/register', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (resp.ok) {
+        out.textContent = 'Registered. You can now log in.';
+      } else {
+        out.textContent = `Error (${resp.status}): ${JSON.stringify(resp.data)}`;
+      }
+    });
+  </script>
+</body>
+</html>

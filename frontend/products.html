@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>Products</title></head>
+<body>
+  <h2>Products</h2>
+
+  <div id="list"></div>
+
+  <script type="module">
+    import { requestJSON } from './utils.js';
+
+    const list = document.getElementById('list');
+
+    async function load() {
+      const r = await requestJSON('/v1/products');
+      list.innerHTML = '';
+      (r.data || []).forEach(p => {
+        const el = document.createElement('div');
+        el.innerHTML = `<b>${p.title}</b> - $${p.price}`;
+        list.appendChild(el);
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>Admin</title></head>
+<body>
+  <h2>Admin Console</h2>
+
+  <section>
+    <h3>Create Product</h3>
+    <form id="createForm">
+      <input name="title" placeholder="title" required>
+      <input name="price" placeholder="price" required type="number" step="0.01">
+      <input name="stock" placeholder="stock" required type="number">
+      <input name="description" placeholder="description">
+      <button>Create</button>
+    </form>
+    <pre id="createOut"></pre>
+  </section>
+
+  <section>
+    <h3>Products (Admin)</h3>
+    <div id="adminList"></div>
+  </section>
+
+  <script type="module">
+    import { requestJSON, getAccessToken } from './utils.js';
+
+    const createForm = document.getElementById('createForm');
+    const createOut = document.getElementById('createOut');
+    const adminList = document.getElementById('adminList');
+
+    function authHeaders() {
+      const token = getAccessToken();
+      return token ? { "Authorization": "Bearer " + token } : {};
+    }
+
+    createForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      createOut.textContent = "Creating...";
+      const data = Object.fromEntries(new FormData(createForm));
+      const resp = await fetch('/v1/products', {
+        method: 'POST',
+        headers: Object.assign({'Content-Type':'application/json'}, authHeaders()),
+        body: JSON.stringify({ title: data.title, description: data.description, price: parseFloat(data.price), stock: parseInt(data.stock||0) })
+      });
+      const j = await resp.json();
+      if (resp.ok) createOut.textContent = 'Created: ' + JSON.stringify(j);
+      else createOut.textContent = 'Error: ' + JSON.stringify(j);
+      loadAdminList();
+    });
+
+    async function loadAdminList() {
+      adminList.innerHTML = 'Loading...';
+      const resp = await fetch('/v1/products');
+      const arr = await resp.json();
+      adminList.innerHTML = '';
+      arr.forEach(p => {
+        const el = document.createElement('div');
+        el.innerHTML = `<strong>${p.title}</strong> - $${p.price} (stock: ${p.stock})
+          <button data-id="${p.id}" class="del">Delete</button>
+          <button data-id="${p.id}" class="edit">Edit</button>`;
+        adminList.appendChild(el);
+      });
+    }
+
+    adminList.addEventListener('click', async (e) => {
+      if (e.target.classList.contains('del')) {
+        const id = e.target.dataset.id;
+        const resp = await fetch('/v1/products/' + encodeURIComponent(id), {
+          method: 'DELETE',
+          headers: authHeaders()
+        });
+        if (resp.status === 204) alert('Deleted');
+        else alert('Delete failed: ' + resp.status);
+        loadAdminList();
+      } else if (e.target.classList.contains('edit')) {
+        const id = e.target.dataset.id;
+        const title = prompt('New title');
+        if (!title) return;
+        const price = prompt('New price');
+        await fetch('/v1/products/' + encodeURIComponent(id), {
+          method: 'PATCH',
+          headers: Object.assign({'Content-Type':'application/json'}, authHeaders()),
+          body: JSON.stringify({ title, price: parseFloat(price) })
+        });
+        loadAdminList();
+      }
+    });
+
+    loadAdminList();
+  </script>
+</body>
+</html>

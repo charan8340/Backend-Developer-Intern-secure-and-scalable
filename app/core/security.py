@@ -4,7 +4,7 @@ import jwt, hashlib, os
 from app.core.config import settings
 from typing import Dict
 
-pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_ctx = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 def hash_password(password: str) -> str:
     return pwd_ctx.hash(password)
@@ -22,14 +22,16 @@ def create_access_token(data: Dict) -> str:
 def decode_access_token(token: str) -> Dict:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        print("DEBUG decode_access_token -> payload:", payload)
         return payload
     except jwt.ExpiredSignatureError:
+        print("DEBUG decode_access_token -> expired token")
         raise
-    except Exception:
+    except Exception as e:
+        print("DEBUG decode_access_token -> exception:", repr(e))
         raise
 
 def generate_refresh_token_raw() -> str:
-    # strong random token (hex)
     return os.urandom(32).hex()
 
 def hash_refresh_token(raw: str) -> str:

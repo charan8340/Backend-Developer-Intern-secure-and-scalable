@@ -14,7 +14,6 @@ def ensure_role(role_name: str, db: Session = Depends(get_db), _ = Depends(requi
 
 @router.post("/assign-role", status_code=201)
 def assign_role(payload: RoleAssign, db: Session = Depends(get_db), _ = Depends(require_admin)):
-    # ensure role exists
     role = get_role_by_name(db, payload.role_name)
     if not role:
         role = create_role_if_not_exists(db, payload.role_name)

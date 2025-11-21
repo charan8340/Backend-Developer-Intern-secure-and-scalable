@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"/><title>User</title></head>
+<body>
+  <h2>User Products</h2>
+  <div id="list"></div>
+
+  <script type="module">
+    import { requestJSON } from './utils.js';
+
+    async function load() {
+      const resp = await requestJSON('/v1/products', { method: 'GET' });
+      const list = document.getElementById('list');
+      if (!resp.ok) {
+        list.textContent = 'Error loading products';
+        return;
+      }
+      list.innerHTML = '';
+      resp.data.forEach(p => {
+        const el = document.createElement('div');
+        el.textContent = `${p.title} - $${p.price}`;
+        list.appendChild(el);
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>

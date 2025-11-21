@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ecommerce RBAC Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Ecommerce — Secure RBAC Demo</h1>
+
+    <!-- AUTH SECTION -->
+    <div id="auth-section" class="section">
+
+        <h2>Register</h2>
+        <form id="register-form">
+            <input name="username" placeholder="Username" required>
+            <input name="email" placeholder="Email" required>
+            <input name="password" placeholder="Password" type="password" required>
+            <select name="role">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+            <button type="submit">Register</button>
+        </form>
+
+        <h2>Login</h2>
+        <form id="login-form">
+            <input name="email" placeholder="Email" required>
+            <input name="password" placeholder="Password" type="password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <pre id="auth-output"></pre>
+    </div>
+
+    <!-- USER DASHBOARD -->
+    <div id="user-section" class="section hidden">
+        <h2>User Dashboard (View Products)</h2>
+        <input id="user-search" placeholder="Search products...">
+        <button onclick="loadUserProducts()">Search</button>
+        <div id="user-product-list"></div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="admin-section" class="section hidden">
+        <h2>Admin Dashboard (Manage Products)</h2>
+
+        <form id="create-product-form">
+            <input name="title" placeholder="Title" required>
+            <input name="price" placeholder="Price" required>
+            <input name="stock" placeholder="Stock" required>
+            <input name="description" placeholder="Description">
+            <button type="submit">Add Product</button>
+        </form>
+
+        <h3>Products</h3>
+        <div id="admin-product-list"></div>
+    </div>
+
+    <button id="logout-btn" class="hidden" onclick="logout()">Logout</button>
+
+</div>
+
+<script src="utils.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
